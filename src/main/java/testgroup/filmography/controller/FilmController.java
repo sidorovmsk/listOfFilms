@@ -11,6 +11,7 @@ import java.util.List;
 
 @Controller
 public class FilmController {
+    private int page;
 
     private FilmService filmService;
 
@@ -21,9 +22,10 @@ public class FilmController {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public ModelAndView allFilms(@RequestParam(defaultValue = "1") int page) {
+        this.page = page;
         List<Film> films = filmService.allFilms(page);
         int filmsCount = filmService.filmsCount();
-        int pagesCount = (filmsCount + 9)/10;
+        int pagesCount = (filmsCount + 9) / 10;
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("films");
         modelAndView.addObject("page", page);
@@ -38,14 +40,14 @@ public class FilmController {
         Film film = filmService.getById(id);
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("editPage");
-        modelAndView.addObject("film", filmService.getById(id));
+        modelAndView.addObject("film", film);
         return modelAndView;
     }
 
     @RequestMapping(value = "/edit", method = RequestMethod.POST)
     public ModelAndView editFilm(@ModelAttribute("film") Film film) {
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("redirect:/");
+        modelAndView.setViewName("redirect:/?page=" + this.page);
         filmService.edit(film);
         return modelAndView;
     }
@@ -60,7 +62,7 @@ public class FilmController {
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public ModelAndView addFilm(@ModelAttribute("film") Film film) {
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("redirect:/");
+        modelAndView.setViewName("redirect:/?page=" + this.page);
         filmService.add(film);
         return modelAndView;
     }
@@ -68,7 +70,7 @@ public class FilmController {
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.GET)
     public ModelAndView deleteFilm(@PathVariable("id") int id) {
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("redirect:/");
+        modelAndView.setViewName("redirect:/?page=" + this.page);
         Film film = filmService.getById(id);
         filmService.delete(film);
         return modelAndView;
